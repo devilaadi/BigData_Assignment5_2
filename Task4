@@ -1,0 +1,17 @@
+REGISTER '/home/cloudera/Desktop/Acadgild/Aviation_5_2/piggybank-0.15.0.jar';
+
+A = LOAD '/home/cloudera/Desktop/Acadgild/Aviation_5_2/DelayedFlights.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',','NO_MULTILINE','UNIX','SKIP_INPUT_HEADER');
+
+B = FOREACH A GENERATE (chararray)$17 as origin, (chararray)$18 as dest, (int)$24 as diversion;
+
+C = FILTER B BY (origin is not NULL) AND (dest is not null) AND (diversion ==1) ;
+
+D = GROUP C BY (origin , dest) ;
+
+E = FOREACH D GENERATE group , COUNT(C.diversion) as cnt ;
+
+F = ORDER E by cnt DESC ;
+
+Result = LIMIT F 1 ;
+
+DUMP Result ;

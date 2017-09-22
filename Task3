@@ -1,0 +1,27 @@
+REGISTER '/home/cloudera/Desktop/Acadgild/Aviation_5_2/piggybank-0.15.0.jar';
+
+A = LOAD '/home/cloudera/Desktop/Acadgild/Aviation_5_2/DelayedFlights.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',','NO_MULTILINE','UNIX','SKIP_INPUT_HEADER');
+
+B = FOREACH A GENERATE (int)$16 as dep_delay, (chararray)$17 as origin;
+
+C = FILTER B BY (dep_delay is not null) AND (origin is not null) ;
+
+D = GROUP C BY  origin ;
+
+E = FOREACH D GENERATE group , AVG(C.dep_delay) as avg;
+
+F = ORDER E BY avg desc ;
+
+RESULT = LIMIT F 10 ;
+
+Lookup = load '/home/cloudera/Desktop/Acadgild/Aviation_5_2/airports.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',','NO_MULTILINE','UNIX','SKIP_INPUT_HEADER');
+ 
+Lookup1 = foreach Lookup generate (chararray)$0 as origin, (chararray)$2 as city, (chararray)$4 as country;
+ 
+Joined = join Lookup1 by origin, RESULT by $0;
+ 
+Final = foreach Joined generate $0,$1,$2,$4;
+ 
+Final_Result = ORDER Final by $3 DESC;
+ 
+dump Final_Result;

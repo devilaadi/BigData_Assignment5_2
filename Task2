@@ -1,0 +1,17 @@
+REGISTER '/home/cloudera/Desktop/Acadgild/Aviation_5_2/piggybank-0.15.0.jar';
+
+A = LOAD '/home/cloudera/Desktop/Acadgild/Aviation_5_2/DelayedFlights.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',','NO_MULTILINE','UNIX','SKIP_INPUT_HEADER');
+
+B = foreach A generate (int)$2 as month,(int)$22 as cancelled,(chararray)$23 as cancel_code;
+
+C = FILTER B by cancelled == 1 AND cancel_code=='B' ;
+
+D = GROUP C BY month;
+
+E = FOREACH D GENERATE group , COUNT(C.cancelled) as cnt ;
+
+F = ORDER E by cnt DESC ; 
+
+RESULT = LIMIT F 1 ;
+
+DUMP RESULT ;

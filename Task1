@@ -1,0 +1,26 @@
+REGISTER '/home/cloudera/Desktop/Acadgild/Aviation_5_2/piggybank-0.15.0.jar';
+
+A = LOAD '/home/cloudera/Desktop/Acadgild/Aviation_5_2/DelayedFlights.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',','NO_MULTILINE','UNIX','SKIP_INPUT_HEADER');
+
+B  = FOREACH A GENERATE (chararray)$18 as dest;
+
+C = FILTER B by dest is not null ;
+
+D = GROUP C BY dest ;
+
+E = FOREACH D GENERATE group , COUNT(C.dest) as cnt ;
+
+F = ORDER E BY cnt desc ;
+
+RESULT = LIMIT F 5 ; 
+
+A1 = LOAD '/home/cloudera/Desktop/Acadgild/Aviation_5_2/airports.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',','NO_MULTILINE','UNIX','SKIP_INPUT_HEADER');
+
+A2 = foreach A1 generate (chararray)$0 as dest, (chararray)$2 as city, (chararray)$4 as country;
+
+joined = join RESULT by $0, A2 by dest;
+
+DUMP joined ;
+
+
+
